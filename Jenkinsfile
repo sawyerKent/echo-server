@@ -1,6 +1,8 @@
 pipeline {
   agent any
 
+  def dockerImage
+
   stages {
     stage('Clone repository') {
       steps {
@@ -14,7 +16,7 @@ pipeline {
     stage('Build Docker image') {
       steps {
         script {
-          def dockerImage = docker.build('sawyerkent.jfrog.io/docker/my-echo-server:1.0.0', '.')
+          dockerImage = docker.build('sawyerkent.jfrog.io/docker/my-echo-server:1.0.0', '.')
         //   def execContainer = docker.build('sawyerkent.jfrog.io/docker/my-echo-server:1.0.0-exec', '-f Dockerfile.exec .')
         //   def scratchContainer = docker.build('sawyerkent.jfrog.io/docker/my-echo-server:1.0.0', '-f Dockerfile.scratch .')
         }
