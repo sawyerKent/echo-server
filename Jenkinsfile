@@ -24,7 +24,7 @@ pipeline {
       steps {
         script {
           withCredentials([usernamePassword(credentialsId: 'jfrog-creds', usernameVariable: 'JFROG_USERNAME', passwordVariable: 'JFROG_PASSWORD')]) {
-            docker.withRegistry("https://sawyerkent.jfrog.io", 'docker') {
+            docker.withRegistry("https://sawyerkent.jfrog.io", 'jfrog-creds') {
               dockerImage.push()
             //   execContainer.push()
             //   scratchContainer.push()
