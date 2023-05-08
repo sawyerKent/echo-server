@@ -31,33 +31,54 @@ pipeline {
       }
     }
     stage('Deploy to Kubernetes') {
-      steps {
+    steps {
         script {
-          def image = 'sawyerkent.jfrog.io/docker/my-echo-server:1.0.0'
-          def namespace = 'default'
-          def deploymentName = 'echo-server'
-          def replicas = 1
+            def image = 'sawyerkent.jfrog.io/docker/my-echo-server:1.0.0'
+            def namespace = 'default'
+            def deploymentName = 'echo-server'
+            def replicas = 1
 
-          kubernetesDeploy(
-            kubeconfigId: 'my-kubeconfig',
-            configs: 'configs',
-            enableConfigSubstitution: true,
-            namespace: namespace,
-            replicas: replicas,
-            deployments: [
-              [
-                name: deploymentName,
-                label: deploymentName,
-                image: image,
-                ports: [
-                  [name: 'http', containerPort: 8080]
-                ]
-              ]
-            ]
-          )
+            withKubeConfig([credentialsId: 'my-kubeconfig', contextName: 'your-kube-context']) {
+                // Substitute variables in the template
+                sh 'envsubst < configs/deployment_template.yaml > configs/deployment.yaml'
+
+                // Deploy the application
+                sh "kubectl apply -f configs/deployment.yaml -n ${namespace}"
+                sh "kubectl set image deployment/${deploymentName} ${deploymentName}=${image} -n ${namespace}"
+                sh "kubectl scale deployment/${deploymentName} --replicas=${replicas} -n ${namespace}"
+            }
         }
-      }
     }
+}
+
+    // stage('Deploy to Kubernetes') {
+    //   steps {
+    //     script {
+    //       def image = 'sawyerkent.jfrog.io/docker/my-echo-server:1.0.0'
+    //       def namespace = 'default'
+    //       def deploymentName = 'echo-server'
+    //       def replicas = 1
+
+    //       kubernetesDeploy(
+    //         kubeconfigId: 'my-kubeconfig',
+    //         configs: 'configs',
+    //         enableConfigSubstitution: true,
+    //         namespace: namespace,
+    //         replicas: replicas,
+    //         deployments: [
+    //           [
+    //             name: deploymentName,
+    //             label: deploymentName,
+    //             image: image,
+    //             ports: [
+    //               [name: 'http', containerPort: 8080]
+    //             ]
+    //           ]
+    //         ]
+    //       )
+    //     }
+    //   }
+    // }
   }
 }
 
