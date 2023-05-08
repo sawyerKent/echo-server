@@ -26,8 +26,8 @@ pipeline {
           withCredentials([usernamePassword(credentialsId: 'jfrog-creds', usernameVariable: 'JFROG_USERNAME', passwordVariable: 'JFROG_PASSWORD')]) {
             docker.withRegistry("https://sawyerkent.jfrog.io", 'docker') {
               dockerImage.push()
-              execContainer.push()
-              scratchContainer.push()
+            //   execContainer.push()
+            //   scratchContainer.push()
             }
           }
         }
